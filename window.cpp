@@ -90,10 +90,10 @@ Window::Window()
     mainLayout->addWidget(messageGroupBox);
     setLayout(mainLayout);
 
-    iconComboBox->setCurrentIndex(1);
+    setIcon(0);
     trayIcon->show();
 
-    setWindowTitle(tr("Systray"));
+    setWindowTitle(tr("Podman"));
     resize(400, 300);
 }
 //! [0]
@@ -190,9 +190,7 @@ void Window::createIconGroupBox()
     iconLabel = new QLabel("Icon:");
 
     iconComboBox = new QComboBox;
-    iconComboBox->addItem(QIcon(":/images/bad.png"), tr("Bad"));
-    iconComboBox->addItem(QIcon(":/images/heart.png"), tr("Heart"));
-    iconComboBox->addItem(QIcon(":/images/trash.png"), tr("Trash"));
+    iconComboBox->addItem(QIcon(":/images/podman.png"), tr("Podman"));
 
     showIconCheckBox = new QCheckBox(tr("Show icon"));
     showIconCheckBox->setChecked(true);
