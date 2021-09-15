@@ -1,0 +1,5 @@
+build-systray-Desktop-Debug/
+build-systray-Desktop-Release/
+build-systray-Desktop-Profile/
+systray
+systray.pro.user
