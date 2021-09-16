@@ -67,6 +67,7 @@ class QLineEdit;
 class QMenu;
 class QPushButton;
 class QSpinBox;
+class QString;
 class QTextEdit;
 QT_END_NAMESPACE
 
@@ -90,11 +91,22 @@ private slots:
     void messageClicked();
 
 private:
+    void createStatusGroupBox();
     void createIconGroupBox();
     void createMessageGroupBox();
     void createActions();
     void createTrayIcon();
 
+    void updateStatus();
+    void sendMachineCommand(QString cmd);
+    void startMachine();
+    void stopMachine();
+
+    QGroupBox *statusGroupBox;
+    QPushButton *updateButton;
+    QLabel *statusLabel;
+    QPushButton *startButton;
+    QPushButton *stopButton;
     QGroupBox *iconGroupBox;
     QLabel *iconLabel;
     QComboBox *iconComboBox;

@@ -66,10 +66,14 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QProcess>
+#include <QThread>
+#include <QDebug>
 
 //! [0]
 Window::Window()
 {
+    createStatusGroupBox();
     createIconGroupBox();
     createMessageGroupBox();
 
@@ -78,6 +82,9 @@ Window::Window()
     createActions();
     createTrayIcon();
 
+    connect(updateButton, &QAbstractButton::clicked, this, &Window::updateStatus);
+    connect(startButton, &QAbstractButton::clicked, this, &Window::startMachine);
+    connect(stopButton, &QAbstractButton::clicked, this, &Window::stopMachine);
     connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
     connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
     connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -86,6 +93,7 @@ Window::Window()
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(statusGroupBox);
     mainLayout->addWidget(iconGroupBox);
     mainLayout->addWidget(messageGroupBox);
     setLayout(mainLayout);
@@ -182,6 +190,94 @@ void Window::messageClicked()
                                 "Maybe you should try asking a human?"));
 }
 //! [6]
+
+void Window::createStatusGroupBox()
+{
+    statusGroupBox = new QGroupBox(tr("Status"));
+
+    updateButton = new QPushButton(tr("Update"));
+    statusLabel = new QLabel("Unknown");
+
+    startButton = new QPushButton(tr("Start"));
+    stopButton = new QPushButton(tr("Stop"));
+
+    updateStatus();
+
+    QHBoxLayout *statusLayout = new QHBoxLayout;
+    statusLayout->addWidget(updateButton);
+    statusLayout->addWidget(statusLabel);
+    statusLayout->addWidget(startButton);
+    statusLayout->addWidget(stopButton);
+    statusGroupBox->setLayout(statusLayout);
+}
+
+void Window::updateStatus()
+{
+    bool success;
+
+    QString program = "podman";
+    QStringList arguments;
+    arguments << "machine" << "list" << "--noheading" << "--format" << "{{.LastUp}}";
+
+    QProcess *process = new QProcess(this);
+    process->start(program, arguments);
+    success = process->waitForFinished();
+    if (success) {
+        QString *text = new QString(process->readAllStandardOutput());
+
+        if (text == QString("Currently running\n")) {
+            statusLabel->setText(tr("Running"));
+            startButton->setEnabled(false);
+            stopButton->setEnabled(true);
+        } else if (!text->isEmpty()){
+            statusLabel->setText(tr("Not Running"));
+            startButton->setEnabled(true);
+            stopButton->setEnabled(false);
+        } else {
+            statusLabel->setText(tr("Not Initialized"));
+            startButton->setEnabled(false);
+            stopButton->setEnabled(false);
+        }
+
+        delete text;
+    }
+    delete process;
+}
+
+void Window::sendMachineCommand(QString cmd)
+{
+    QString program = "podman";
+    QStringList arguments;
+    arguments << "machine" << cmd;
+    bool success;
+
+    QProcess *process = new QProcess(this);
+    process->start(program, arguments);
+    this->setCursor(Qt::WaitCursor);
+    success = process->waitForFinished();
+    if (cmd == QString("stop")) {
+            // command returns too quick
+            QThread::sleep(1);
+    }
+    this->unsetCursor();
+
+    if (!success) {
+        qDebug() << process->readAllStandardOutput();
+        qDebug() << process->readAllStandardError();
+    }
+}
+
+void Window::startMachine()
+{
+    sendMachineCommand(QString("start"));
+    updateStatus();
+}
+
+void Window::stopMachine()
+{
+    sendMachineCommand(QString("stop"));
+    updateStatus();
+}
 
 void Window::createIconGroupBox()
 {
