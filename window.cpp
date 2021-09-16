@@ -205,7 +205,9 @@ void Window::createStatusGroupBox()
 {
     statusGroupBox = new QGroupBox(tr("Status"));
 
-    updateButton = new QPushButton(tr("Update"));
+    QIcon updateIcon = QIcon::fromTheme("view-refresh");
+    updateButton = new QPushButton(updateIcon, "");
+    updateButton->setFixedWidth(32);
     statusLabel = new QLabel("Unknown");
 
     startButton = new QPushButton(tr("Start"));
