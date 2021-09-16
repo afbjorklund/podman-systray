@@ -3,3 +3,10 @@ build-systray-Desktop-Release/
 build-systray-Desktop-Profile/
 systray
 systray.pro.user
+# qmake
+.qmake.stash
+Makefile
+moc_predefs.h
+moc_*.cpp
+qrc_*.cpp
+*.o
