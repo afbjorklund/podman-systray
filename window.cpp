@@ -61,6 +61,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QPixmap>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTextEdit>
@@ -73,6 +74,14 @@
 //! [0]
 Window::Window()
 {
+    textLabel = new QLabel();
+    textLabel->setFixedWidth(200);
+    textLabel->setFixedHeight(50);
+    QPixmap textPixmap(":/images/text.png");
+    int w = textLabel->width();
+    int h = textLabel->height();
+    textLabel->setPixmap(textPixmap.scaled(w, h, Qt::KeepAspectRatio));
+
     createStatusGroupBox();
     createIconGroupBox();
     createMessageGroupBox();
@@ -93,6 +102,7 @@ Window::Window()
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(textLabel);
     mainLayout->addWidget(statusGroupBox);
     //mainLayout->addWidget(iconGroupBox);
     //mainLayout->addWidget(messageGroupBox);

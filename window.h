@@ -102,6 +102,8 @@ private:
     void startMachine();
     void stopMachine();
 
+    QLabel *textLabel;
+
     QGroupBox *statusGroupBox;
     QPushButton *updateButton;
     QLabel *statusLabel;
