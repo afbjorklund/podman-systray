@@ -70,6 +70,7 @@
 #include <QProcess>
 #include <QThread>
 #include <QDebug>
+#include <QRegExp>
 
 //! [0]
 Window::Window()
@@ -218,6 +219,7 @@ void Window::createStatusGroupBox()
     removeButton = new QPushButton(tr("Remove"));
 
     versionLabel = new QLabel();
+    osReleaseLabel = new QLabel();
 
     QGridLayout *statusLayout = new QGridLayout;
     statusLayout->addWidget(updateButton, 0, 0, 1, 4);
@@ -227,6 +229,7 @@ void Window::createStatusGroupBox()
     statusLayout->addWidget(versionLabel, 1, 0, 2, 2);
     statusLayout->addWidget(initButton, 2, 2);
     statusLayout->addWidget(removeButton, 2, 3);
+    statusLayout->addWidget(osReleaseLabel, 3, 0, 1, 4);
     statusGroupBox->setLayout(statusLayout);
 
     updateStatus();
@@ -280,6 +283,15 @@ void Window::updateStatus()
     delete text;
 }
 
+QString Window::prettyName(QString release)
+{
+    QRegExp re("PRETTY_NAME=\"([^\"]*)\"");
+    if (release.contains(re)) {
+        return re.cap(1);
+    }
+    return "";
+}
+
 void Window::updateVersion()
 {
     bool success;
@@ -293,11 +305,21 @@ void Window::updateVersion()
     if (success) {
         versionLabel->setText(version);
     }
+
+    arguments.clear();
+    arguments << "machine" << "ssh" << "cat" << "/etc/os-release";
+
+    QString release;
+    success = getProcessOutput(arguments, release);
+    if (success) {
+        osReleaseLabel->setText(prettyName(release));
+    }
 }
 
 void Window::clearVersion()
 {
     versionLabel->setText("");
+    osReleaseLabel->setText("");
 }
 
 void Window::sendMachineCommand(QString cmd)
