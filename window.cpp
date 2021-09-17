@@ -314,10 +314,23 @@ void Window::initMachine()
     updateStatus();
 }
 
+bool Window::askConfirm()
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText("Remove an existing machine");
+    msgBox.setInformativeText("Are you sure you want to continue? This will delete all files for the podman machine.");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    return msgBox.exec() == QMessageBox::Ok;
+}
+
 void Window::removeMachine()
 {
-    QStringList args = {"rm", "--force"};
-    sendMachineCommand(args);
+    if (askConfirm()) {
+        QStringList args = {"rm", "--force"};
+        sendMachineCommand(args);
+    }
     updateStatus();
 }
 

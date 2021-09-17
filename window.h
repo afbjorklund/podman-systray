@@ -104,6 +104,7 @@ private:
     void startMachine();
     void stopMachine();
     void initMachine();
+    bool askConfirm();
     void removeMachine();
 
     QLabel *textLabel;
