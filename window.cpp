@@ -229,20 +229,29 @@ void Window::createStatusGroupBox()
     updateStatus();
 }
 
-void Window::updateStatus()
-{
+bool Window::getProcessOutput(QStringList arguments, QString& text) {
     bool success;
 
     QString program = "podman";
-    QStringList arguments;
-    arguments << "machine" << "list" << "--noheading" << "--format" << "{{.LastUp}}";
 
     QProcess *process = new QProcess(this);
     process->start(program, arguments);
     success = process->waitForFinished();
     if (success) {
-        QString *text = new QString(process->readAllStandardOutput());
+        text = process->readAllStandardOutput();
+    }
+    delete process;
+    return success;
+}
 
+void Window::updateStatus()
+{
+    QStringList arguments;
+    arguments << "machine" << "list" << "--noheading" << "--format" << "{{.LastUp}}";
+
+    QString *text = new QString();
+    bool success = getProcessOutput(arguments, *text);
+    if (success) {
         if (text == QString("Currently running\n")) {
             statusLabel->setText(tr("Running"));
             startButton->setEnabled(false);
@@ -262,10 +271,8 @@ void Window::updateStatus()
             initButton->setEnabled(true);
             removeButton->setEnabled(false);
         }
-
-        delete text;
     }
-    delete process;
+    delete text;
 }
 
 void Window::sendMachineCommand(QString cmd)
