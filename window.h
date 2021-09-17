@@ -100,6 +100,8 @@ private:
 
     bool getProcessOutput(QStringList arguments, QString& text);
     void updateStatus();
+    void updateVersion();
+    void clearVersion();
     void sendMachineCommand(QString cmd);
     void sendMachineCommand(QStringList cmds);
     void startMachine();
@@ -117,6 +119,7 @@ private:
     QPushButton *stopButton;
     QPushButton *initButton;
     QPushButton *removeButton;
+    QLabel *versionLabel;
 
     QGroupBox *iconGroupBox;
     QLabel *iconLabel;

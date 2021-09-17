@@ -217,11 +217,14 @@ void Window::createStatusGroupBox()
     initButton = new QPushButton(tr("Init"));
     removeButton = new QPushButton(tr("Remove"));
 
+    versionLabel = new QLabel();
+
     QGridLayout *statusLayout = new QGridLayout;
     statusLayout->addWidget(updateButton, 0, 0, 1, 4);
     statusLayout->addWidget(statusLabel, 0, 1);
     statusLayout->addWidget(startButton, 1, 2);
     statusLayout->addWidget(stopButton, 1, 3);
+    statusLayout->addWidget(versionLabel, 1, 0, 2, 2);
     statusLayout->addWidget(initButton, 2, 2);
     statusLayout->addWidget(removeButton, 2, 3);
     statusGroupBox->setLayout(statusLayout);
@@ -253,6 +256,7 @@ void Window::updateStatus()
     bool success = getProcessOutput(arguments, *text);
     if (success) {
         if (text == QString("Currently running\n")) {
+            updateVersion();
             statusLabel->setText(tr("Running"));
             startButton->setEnabled(false);
             stopButton->setEnabled(true);
@@ -265,6 +269,7 @@ void Window::updateStatus()
             initButton->setEnabled(false);
             removeButton->setEnabled(true);
         } else {
+            clearVersion();
             statusLabel->setText(tr("Not Initialized"));
             startButton->setEnabled(false);
             stopButton->setEnabled(false);
@@ -273,6 +278,26 @@ void Window::updateStatus()
         }
     }
     delete text;
+}
+
+void Window::updateVersion()
+{
+    bool success;
+
+    QString program = "podman";
+    QStringList arguments;
+    arguments << "machine" << "ssh" << "podman" << "--version";
+
+    QString version;
+    success = getProcessOutput(arguments, version);
+    if (success) {
+        versionLabel->setText(version);
+    }
+}
+
+void Window::clearVersion()
+{
+    versionLabel->setText("");
 }
 
 void Window::sendMachineCommand(QString cmd)
