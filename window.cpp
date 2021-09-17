@@ -337,7 +337,12 @@ void Window::sendMachineCommand(QStringList cmds)
     QProcess *process = new QProcess(this);
     process->start(program, arguments);
     this->setCursor(Qt::WaitCursor);
-    success = process->waitForFinished();
+    int timeout = 30;
+    if (cmds[0] == QString("init")) {
+            // this might take a while
+            timeout = 300;
+    }
+    success = process->waitForFinished(timeout * 1000);
     if (cmds[0] == QString("stop")) {
             // command returns too quick
             QThread::sleep(1);
