@@ -94,6 +94,8 @@ Window::Window()
     connect(updateButton, &QAbstractButton::clicked, this, &Window::updateStatus);
     connect(startButton, &QAbstractButton::clicked, this, &Window::startMachine);
     connect(stopButton, &QAbstractButton::clicked, this, &Window::stopMachine);
+    connect(initButton, &QAbstractButton::clicked, this, &Window::initMachine);
+    connect(removeButton, &QAbstractButton::clicked, this, &Window::removeMachine);
     connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
     connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
     connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -212,15 +214,19 @@ void Window::createStatusGroupBox()
 
     startButton = new QPushButton(tr("Start"));
     stopButton = new QPushButton(tr("Stop"));
+    initButton = new QPushButton(tr("Init"));
+    removeButton = new QPushButton(tr("Remove"));
+
+    QGridLayout *statusLayout = new QGridLayout;
+    statusLayout->addWidget(updateButton, 0, 0, 1, 4);
+    statusLayout->addWidget(statusLabel, 0, 1);
+    statusLayout->addWidget(startButton, 1, 2);
+    statusLayout->addWidget(stopButton, 1, 3);
+    statusLayout->addWidget(initButton, 2, 2);
+    statusLayout->addWidget(removeButton, 2, 3);
+    statusGroupBox->setLayout(statusLayout);
 
     updateStatus();
-
-    QHBoxLayout *statusLayout = new QHBoxLayout;
-    statusLayout->addWidget(updateButton);
-    statusLayout->addWidget(statusLabel);
-    statusLayout->addWidget(startButton);
-    statusLayout->addWidget(stopButton);
-    statusGroupBox->setLayout(statusLayout);
 }
 
 void Window::updateStatus()
@@ -241,14 +247,20 @@ void Window::updateStatus()
             statusLabel->setText(tr("Running"));
             startButton->setEnabled(false);
             stopButton->setEnabled(true);
+            initButton->setEnabled(false);
+            removeButton->setEnabled(false);
         } else if (!text->isEmpty()){
             statusLabel->setText(tr("Not Running"));
             startButton->setEnabled(true);
             stopButton->setEnabled(false);
+            initButton->setEnabled(false);
+            removeButton->setEnabled(true);
         } else {
             statusLabel->setText(tr("Not Initialized"));
             startButton->setEnabled(false);
             stopButton->setEnabled(false);
+            initButton->setEnabled(true);
+            removeButton->setEnabled(false);
         }
 
         delete text;
@@ -258,16 +270,21 @@ void Window::updateStatus()
 
 void Window::sendMachineCommand(QString cmd)
 {
+    sendMachineCommand(QStringList(cmd));
+}
+
+void Window::sendMachineCommand(QStringList cmds)
+{
     QString program = "podman";
     QStringList arguments;
-    arguments << "machine" << cmd;
+    arguments << "machine" << cmds;
     bool success;
 
     QProcess *process = new QProcess(this);
     process->start(program, arguments);
     this->setCursor(Qt::WaitCursor);
     success = process->waitForFinished();
-    if (cmd == QString("stop")) {
+    if (cmds[0] == QString("stop")) {
             // command returns too quick
             QThread::sleep(1);
     }
@@ -288,6 +305,19 @@ void Window::startMachine()
 void Window::stopMachine()
 {
     sendMachineCommand(QString("stop"));
+    updateStatus();
+}
+
+void Window::initMachine()
+{
+    sendMachineCommand(QString("init"));
+    updateStatus();
+}
+
+void Window::removeMachine()
+{
+    QStringList args = {"rm", "--force"};
+    sendMachineCommand(args);
     updateStatus();
 }
 

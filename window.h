@@ -68,6 +68,7 @@ class QMenu;
 class QPushButton;
 class QSpinBox;
 class QString;
+class QStringList;
 class QTextEdit;
 QT_END_NAMESPACE
 
@@ -99,8 +100,11 @@ private:
 
     void updateStatus();
     void sendMachineCommand(QString cmd);
+    void sendMachineCommand(QStringList cmds);
     void startMachine();
     void stopMachine();
+    void initMachine();
+    void removeMachine();
 
     QLabel *textLabel;
 
@@ -109,6 +113,9 @@ private:
     QLabel *statusLabel;
     QPushButton *startButton;
     QPushButton *stopButton;
+    QPushButton *initButton;
+    QPushButton *removeButton;
+
     QGroupBox *iconGroupBox;
     QLabel *iconLabel;
     QComboBox *iconComboBox;
