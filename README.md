@@ -1,14 +1,33 @@
 # Podman System Tray Icon
 
-## First launch
+## Running
+
+Open in [Qt Creator](https://doc.qt.io/qtcreator/) GUI:
+
+```shell
+qtcreator systray.pro
+```
+
+Or on the command line:
+
+```console
+$ qmake
+$ make
+...
+$ ./systray
+```
+
+## Screenshots
+
+### First launch
 
 ![podman-systray screenshot](screenshot1.png)
 
-## Not yet running
+### Not yet running
 
 ![podman-systray screenshot](screenshot2.png)
 
-## Running machine
+### Running machine
 
 ![podman-systray screenshot](screenshot3.png)
 
