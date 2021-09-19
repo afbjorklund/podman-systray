@@ -96,6 +96,7 @@ private:
     void createTrayIcon();
 
     bool getProcessOutput(QStringList arguments, QString& text);
+    void updateName();
     void updateStatus();
     QString prettyName(QString release);
     void updateVersion();
@@ -115,6 +116,7 @@ private:
 
     QGroupBox *statusGroupBox;
     QPushButton *updateButton;
+    QLabel *nameLabel;
     QLabel *statusLabel;
     QPushButton *startButton;
     QPushButton *stopButton;

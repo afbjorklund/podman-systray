@@ -86,6 +86,7 @@ Window::Window()
     createStatusGroupBox();
     createConnectionGroupBox();
 
+    updateName();
     updateStatus();
     updateConnections();
 
@@ -180,6 +181,7 @@ void Window::createStatusGroupBox()
     QIcon updateIcon = QIcon(":/images/view-refresh.png");
     updateButton = new QPushButton(updateIcon, "");
     updateButton->setFixedWidth(32);
+    nameLabel = new QLabel("");
     statusLabel = new QLabel("Unknown");
 
     startButton = new QPushButton(tr("Start"));
@@ -191,14 +193,15 @@ void Window::createStatusGroupBox()
     osReleaseLabel = new QLabel();
 
     QGridLayout *statusLayout = new QGridLayout;
-    statusLayout->addWidget(updateButton, 0, 0, 1, 4);
-    statusLayout->addWidget(statusLabel, 0, 1);
-    statusLayout->addWidget(startButton, 1, 2);
-    statusLayout->addWidget(stopButton, 1, 3);
-    statusLayout->addWidget(versionLabel, 1, 0, 2, 2);
-    statusLayout->addWidget(initButton, 2, 2);
-    statusLayout->addWidget(removeButton, 2, 3);
-    statusLayout->addWidget(osReleaseLabel, 3, 0, 1, 4);
+    statusLayout->addWidget(nameLabel, 0, 0, 1, 5);
+    statusLayout->addWidget(updateButton, 1, 0, 1, 4);
+    statusLayout->addWidget(statusLabel, 1, 1);
+    statusLayout->addWidget(startButton, 2, 2);
+    statusLayout->addWidget(stopButton, 2, 3);
+    statusLayout->addWidget(versionLabel, 2, 0, 2, 2);
+    statusLayout->addWidget(initButton, 3, 2);
+    statusLayout->addWidget(removeButton, 3, 3);
+    statusLayout->addWidget(osReleaseLabel, 4, 0, 1, 4);
     statusGroupBox->setLayout(statusLayout);
 }
 
@@ -228,6 +231,24 @@ bool Window::getProcessOutput(QStringList arguments, QString& text) {
     }
     delete process;
     return success;
+}
+
+void Window::updateName()
+{
+    QStringList arguments;
+    arguments << "machine" << "list" << "--noheading" << "--format" << "{{.Name}}";
+
+    QString text;
+    bool success = getProcessOutput(arguments, text);
+    if (success) {
+        QString name = text.trimmed();
+        if (name.endsWith("*")) {
+            name.chop(1);
+        }
+        nameLabel->setText(name);
+    } else {
+        nameLabel->clear();
+    }
 }
 
 void Window::updateStatus()
