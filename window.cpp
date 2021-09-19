@@ -84,10 +84,8 @@ Window::Window()
     textLabel->setPixmap(textPixmap.scaled(w, h, Qt::KeepAspectRatio));
 
     createStatusGroupBox();
-    createIconGroupBox();
-    createMessageGroupBox();
-
-    iconLabel->setMinimumWidth(durationLabel->sizeHint().width());
+    iconComboBox = new QComboBox;
+    iconComboBox->addItem(QIcon(":/images/podman.png"), tr("Podman"));
 
     createActions();
     createTrayIcon();
@@ -97,18 +95,11 @@ Window::Window()
     connect(stopButton, &QAbstractButton::clicked, this, &Window::stopMachine);
     connect(initButton, &QAbstractButton::clicked, this, &Window::initMachine);
     connect(removeButton, &QAbstractButton::clicked, this, &Window::removeMachine);
-    connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
-    connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
-    connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &Window::setIcon);
-    connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &Window::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(textLabel);
     mainLayout->addWidget(statusGroupBox);
-    //mainLayout->addWidget(iconGroupBox);
-    //mainLayout->addWidget(messageGroupBox);
     setLayout(mainLayout);
 
     setIcon(0);
@@ -168,41 +159,11 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::DoubleClick:
         iconComboBox->setCurrentIndex((iconComboBox->currentIndex() + 1) % iconComboBox->count());
         break;
-    case QSystemTrayIcon::MiddleClick:
-        showMessage();
-        break;
     default:
         ;
     }
 }
 //! [4]
-
-//! [5]
-void Window::showMessage()
-{
-    showIconCheckBox->setChecked(true);
-    int selectedIcon = typeComboBox->itemData(typeComboBox->currentIndex()).toInt();
-    QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(selectedIcon);
-
-    if (selectedIcon == -1) { // custom icon
-        QIcon icon(iconComboBox->itemIcon(iconComboBox->currentIndex()));
-        trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), icon,
-                          durationSpinBox->value() * 1000);
-    } else {
-        trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), msgIcon,
-                          durationSpinBox->value() * 1000);
-    }
-}
-//! [5]
-
-//! [6]
-void Window::messageClicked()
-{
-    QMessageBox::information(0, tr("Systray"),
-                             tr("Sorry, I already gave what help I could.\n"
-                                "Maybe you should try asking a human?"));
-}
-//! [6]
 
 void Window::createStatusGroupBox()
 {
@@ -396,87 +357,6 @@ void Window::removeMachine()
         sendMachineCommand(args);
     }
     updateStatus();
-}
-
-void Window::createIconGroupBox()
-{
-    iconGroupBox = new QGroupBox(tr("Tray Icon"));
-
-    iconLabel = new QLabel("Icon:");
-
-    iconComboBox = new QComboBox;
-    iconComboBox->addItem(QIcon(":/images/podman.png"), tr("Podman"));
-
-    showIconCheckBox = new QCheckBox(tr("Show icon"));
-    showIconCheckBox->setChecked(true);
-
-    QHBoxLayout *iconLayout = new QHBoxLayout;
-    iconLayout->addWidget(iconLabel);
-    iconLayout->addWidget(iconComboBox);
-    iconLayout->addStretch();
-    iconLayout->addWidget(showIconCheckBox);
-    iconGroupBox->setLayout(iconLayout);
-}
-
-void Window::createMessageGroupBox()
-{
-    messageGroupBox = new QGroupBox(tr("Balloon Message"));
-
-    typeLabel = new QLabel(tr("Type:"));
-
-    typeComboBox = new QComboBox;
-    typeComboBox->addItem(tr("None"), QSystemTrayIcon::NoIcon);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxInformation), tr("Information"),
-            QSystemTrayIcon::Information);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxWarning), tr("Warning"),
-            QSystemTrayIcon::Warning);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxCritical), tr("Critical"),
-            QSystemTrayIcon::Critical);
-    typeComboBox->addItem(QIcon(), tr("Custom icon"),
-            -1);
-    typeComboBox->setCurrentIndex(1);
-
-    durationLabel = new QLabel(tr("Duration:"));
-
-    durationSpinBox = new QSpinBox;
-    durationSpinBox->setRange(5, 60);
-    durationSpinBox->setSuffix(" s");
-    durationSpinBox->setValue(15);
-
-    durationWarningLabel = new QLabel(tr("(some systems might ignore this "
-                                         "hint)"));
-    durationWarningLabel->setIndent(10);
-
-    titleLabel = new QLabel(tr("Title:"));
-
-    titleEdit = new QLineEdit(tr("Cannot connect to network"));
-
-    bodyLabel = new QLabel(tr("Body:"));
-
-    bodyEdit = new QTextEdit;
-    bodyEdit->setPlainText(tr("Don't believe me. Honestly, I don't have a "
-                              "clue.\nClick this balloon for details."));
-
-    showMessageButton = new QPushButton(tr("Show Message"));
-    showMessageButton->setDefault(true);
-
-    QGridLayout *messageLayout = new QGridLayout;
-    messageLayout->addWidget(typeLabel, 0, 0);
-    messageLayout->addWidget(typeComboBox, 0, 1, 1, 2);
-    messageLayout->addWidget(durationLabel, 1, 0);
-    messageLayout->addWidget(durationSpinBox, 1, 1);
-    messageLayout->addWidget(durationWarningLabel, 1, 2, 1, 3);
-    messageLayout->addWidget(titleLabel, 2, 0);
-    messageLayout->addWidget(titleEdit, 2, 1, 1, 4);
-    messageLayout->addWidget(bodyLabel, 3, 0);
-    messageLayout->addWidget(bodyEdit, 3, 1, 2, 4);
-    messageLayout->addWidget(showMessageButton, 5, 4);
-    messageLayout->setColumnStretch(3, 1);
-    messageLayout->setRowStretch(4, 1);
-    messageGroupBox->setLayout(messageLayout);
 }
 
 void Window::createActions()
