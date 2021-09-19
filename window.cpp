@@ -279,6 +279,11 @@ void Window::updateStatus()
             initButton->setEnabled(true);
             removeButton->setEnabled(false);
         }
+    } else {
+        startButton->setEnabled(false);
+        stopButton->setEnabled(false);
+        initButton->setEnabled(false);
+        removeButton->setEnabled(false);
     }
     delete text;
 }
