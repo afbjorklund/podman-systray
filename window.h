@@ -91,6 +91,7 @@ private slots:
 
 private:
     void createStatusGroupBox();
+    void createConnectionGroupBox();
     void createActions();
     void createTrayIcon();
 
@@ -99,6 +100,9 @@ private:
     QString prettyName(QString release);
     void updateVersion();
     void clearVersion();
+    void updateConnections();
+    void clearConnections();
+    void setConnection(int index);
     void sendMachineCommand(QString cmd);
     void sendMachineCommand(QStringList cmds);
     void startMachine();
@@ -118,6 +122,9 @@ private:
     QPushButton *removeButton;
     QLabel *versionLabel;
     QLabel *osReleaseLabel;
+
+    QGroupBox *connectionGroupBox;
+    QComboBox *connectionComboBox;
 
     QComboBox *iconComboBox;
 

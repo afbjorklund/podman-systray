@@ -84,6 +84,11 @@ Window::Window()
     textLabel->setPixmap(textPixmap.scaled(w, h, Qt::KeepAspectRatio));
 
     createStatusGroupBox();
+    createConnectionGroupBox();
+
+    updateStatus();
+    updateConnections();
+
     iconComboBox = new QComboBox;
     iconComboBox->addItem(QIcon(":/images/podman.png"), tr("Podman"));
 
@@ -91,6 +96,8 @@ Window::Window()
     createTrayIcon();
 
     connect(updateButton, &QAbstractButton::clicked, this, &Window::updateStatus);
+    connect(connectionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::setConnection);
     connect(startButton, &QAbstractButton::clicked, this, &Window::startMachine);
     connect(stopButton, &QAbstractButton::clicked, this, &Window::stopMachine);
     connect(initButton, &QAbstractButton::clicked, this, &Window::initMachine);
@@ -100,6 +107,7 @@ Window::Window()
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(textLabel);
     mainLayout->addWidget(statusGroupBox);
+    mainLayout->addWidget(connectionGroupBox);
     setLayout(mainLayout);
 
     setIcon(0);
@@ -192,8 +200,17 @@ void Window::createStatusGroupBox()
     statusLayout->addWidget(removeButton, 2, 3);
     statusLayout->addWidget(osReleaseLabel, 3, 0, 1, 4);
     statusGroupBox->setLayout(statusLayout);
+}
 
-    updateStatus();
+void Window::createConnectionGroupBox()
+{
+    connectionGroupBox = new QGroupBox(tr("Connection"));
+
+    connectionComboBox = new QComboBox;
+
+    QVBoxLayout *connectionLayout = new QVBoxLayout;
+    connectionLayout->addWidget(connectionComboBox);
+    connectionGroupBox->setLayout(connectionLayout);
 }
 
 bool Window::getProcessOutput(QStringList arguments, QString& text) {
@@ -206,6 +223,8 @@ bool Window::getProcessOutput(QStringList arguments, QString& text) {
     success = process->waitForFinished();
     if (success) {
         text = process->readAllStandardOutput();
+    } else {
+        qDebug() << process->readAllStandardError();
     }
     delete process;
     return success;
@@ -221,6 +240,7 @@ void Window::updateStatus()
     if (success) {
         if (text == QString("Currently running\n")) {
             updateVersion();
+            updateConnections();
             statusLabel->setText(tr("Running"));
             startButton->setEnabled(false);
             stopButton->setEnabled(true);
@@ -234,6 +254,7 @@ void Window::updateStatus()
             removeButton->setEnabled(true);
         } else {
             clearVersion();
+            clearConnections();
             statusLabel->setText(tr("Not Initialized"));
             startButton->setEnabled(false);
             stopButton->setEnabled(false);
@@ -286,6 +307,55 @@ void Window::clearVersion()
 {
     versionLabel->setText("");
     osReleaseLabel->setText("");
+}
+
+void Window::updateConnections()
+{
+    QStringList arguments;
+    arguments << "system" << "connection" << "list" << "--format" << "{{.Name}}";
+
+    QString *text = new QString();
+    bool success = getProcessOutput(arguments, *text);
+    if (success) {
+        connectionComboBox->clear();
+        QStringList lines = text->split("\n");
+        for (int i = 0; i < lines.length() - 1; i++)
+        {
+            QString name = lines[i];
+            bool defaultConnection = false;
+            if (name.endsWith("*")) {
+                name.chop(1);
+                defaultConnection = true;
+            }
+            connectionComboBox->addItem(name);
+            if (defaultConnection) {
+                connectionComboBox->setCurrentIndex(i);
+            }
+        }
+    }
+    delete text;
+}
+
+void Window::clearConnections()
+{
+    connectionComboBox->clear();
+    connectionComboBox->setEnabled(false);
+}
+
+void Window::setConnection(int index)
+{
+    QString conn = connectionComboBox->itemText(index);
+
+    QStringList arguments;
+    arguments << "system" << "connection" << "default" << conn;
+
+    QString text;
+    bool success = getProcessOutput(arguments, text);
+    if (!success) {
+        QMessageBox::warning(this, tr("Podman"),
+                             tr("Unable to set connection") +
+                             QString(" ") + QString(conn));
+    }
 }
 
 void Window::sendMachineCommand(QString cmd)
