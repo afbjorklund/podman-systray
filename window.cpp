@@ -83,7 +83,7 @@ Window::Window()
     int h = textLabel->height();
     textLabel->setPixmap(textPixmap.scaled(w, h, Qt::KeepAspectRatio));
 
-    createStatusGroupBox();
+    createMachineGroupBox();
     createConnectionGroupBox();
 
     updateName();
@@ -107,7 +107,7 @@ Window::Window()
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(textLabel);
-    mainLayout->addWidget(statusGroupBox);
+    mainLayout->addWidget(machineGroupBox);
     mainLayout->addWidget(connectionGroupBox);
     setLayout(mainLayout);
 
@@ -174,9 +174,9 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 }
 //! [4]
 
-void Window::createStatusGroupBox()
+void Window::createMachineGroupBox()
 {
-    statusGroupBox = new QGroupBox(tr("Status"));
+    machineGroupBox = new QGroupBox(tr("Machine"));
 
     QIcon updateIcon = QIcon(":/images/view-refresh.png");
     updateButton = new QPushButton(updateIcon, "");
@@ -192,17 +192,17 @@ void Window::createStatusGroupBox()
     versionLabel = new QLabel();
     osReleaseLabel = new QLabel();
 
-    QGridLayout *statusLayout = new QGridLayout;
-    statusLayout->addWidget(nameLabel, 0, 0, 1, 5);
-    statusLayout->addWidget(updateButton, 1, 0, 1, 4);
-    statusLayout->addWidget(statusLabel, 1, 1);
-    statusLayout->addWidget(startButton, 2, 2);
-    statusLayout->addWidget(stopButton, 2, 3);
-    statusLayout->addWidget(versionLabel, 2, 0, 2, 2);
-    statusLayout->addWidget(initButton, 3, 2);
-    statusLayout->addWidget(removeButton, 3, 3);
-    statusLayout->addWidget(osReleaseLabel, 4, 0, 1, 4);
-    statusGroupBox->setLayout(statusLayout);
+    QGridLayout *machineLayout = new QGridLayout;
+    machineLayout->addWidget(nameLabel, 0, 0, 1, 5);
+    machineLayout->addWidget(updateButton, 1, 0, 1, 4);
+    machineLayout->addWidget(statusLabel, 1, 1);
+    machineLayout->addWidget(startButton, 2, 2);
+    machineLayout->addWidget(stopButton, 2, 3);
+    machineLayout->addWidget(versionLabel, 2, 0, 2, 2);
+    machineLayout->addWidget(initButton, 3, 2);
+    machineLayout->addWidget(removeButton, 3, 3);
+    machineLayout->addWidget(osReleaseLabel, 4, 0, 1, 4);
+    machineGroupBox->setLayout(machineLayout);
 }
 
 void Window::createConnectionGroupBox()

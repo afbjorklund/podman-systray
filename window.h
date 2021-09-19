@@ -90,7 +90,7 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
-    void createStatusGroupBox();
+    void createMachineGroupBox();
     void createConnectionGroupBox();
     void createActions();
     void createTrayIcon();
@@ -114,7 +114,7 @@ private:
 
     QLabel *textLabel;
 
-    QGroupBox *statusGroupBox;
+    QGroupBox *machineGroupBox;
     QPushButton *updateButton;
     QLabel *nameLabel;
     QLabel *statusLabel;
