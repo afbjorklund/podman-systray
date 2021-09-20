@@ -74,6 +74,13 @@
 #include <QDebug>
 #include <QRegExp>
 
+#ifndef QT_NO_TERMWIDGET
+#include <QApplication>
+#include <QMainWindow>
+#include <QStandardPaths>
+#include "qtermwidget.h"
+#endif
+
 //! [0]
 Window::Window()
 {
@@ -98,6 +105,7 @@ Window::Window()
     createActions();
     createTrayIcon();
 
+    connect(sshButton, &QAbstractButton::clicked, this, &Window::sshConsole);
     connect(updateButton, &QAbstractButton::clicked, this, &Window::updateStatus);
     connect(connectionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &Window::setConnection);
@@ -184,7 +192,12 @@ void Window::createMachineGroupBox()
     updateButton = new QPushButton(updateIcon, "");
     updateButton->setFixedWidth(32);
     nameLabel = new QLabel("");
+    sshButton = new QPushButton(tr("SSH"));
     statusLabel = new QLabel("Unknown");
+
+#ifdef QT_NO_TERMWIDGET
+    sshButton->setEnabled(false);
+#endif
 
     startButton = new QPushButton(tr("Start"));
     stopButton = new QPushButton(tr("Stop"));
@@ -195,7 +208,8 @@ void Window::createMachineGroupBox()
     osReleaseLabel = new QLabel();
 
     QGridLayout *machineLayout = new QGridLayout;
-    machineLayout->addWidget(nameLabel, 0, 0, 1, 5);
+    machineLayout->addWidget(nameLabel, 0, 0, 1, 3);
+    machineLayout->addWidget(sshButton, 0, 3);
     machineLayout->addWidget(updateButton, 1, 0, 1, 4);
     machineLayout->addWidget(statusLabel, 1, 1);
     machineLayout->addWidget(startButton, 2, 2);
@@ -216,6 +230,34 @@ void Window::createConnectionGroupBox()
     QVBoxLayout *connectionLayout = new QVBoxLayout;
     connectionLayout->addWidget(connectionComboBox);
     connectionGroupBox->setLayout(connectionLayout);
+}
+
+void Window::sshConsole()
+{
+#ifndef QT_NO_TERMWIDGET
+    QMainWindow *mainWindow = new QMainWindow();
+    int startnow = 0; // set shell program first
+
+    QTermWidget *console = new QTermWidget(startnow);
+
+    QFont font = QApplication::font();
+    font.setFamily("Monospace");
+    font.setPointSize(10);
+
+    console->setTerminalFont(font);
+    console->setColorScheme("Tango");
+    console->setShellProgram(QStandardPaths::findExecutable("podman"));
+    QStringList args = {"machine", "ssh"};
+    console->setArgs(args);
+    console->startShellProgram();
+
+    QObject::connect(console, SIGNAL(finished()), mainWindow, SLOT(close()));
+
+    mainWindow->setWindowTitle(nameLabel->text());
+    mainWindow->resize(800, 400);
+    mainWindow->setCentralWidget(console);
+    mainWindow->show();
+#endif
 }
 
 bool Window::getProcessOutput(QStringList arguments, QString& text) {

@@ -97,6 +97,7 @@ private:
     void createActions();
     void createTrayIcon();
 
+    void sshConsole();
     bool getProcessOutput(QStringList arguments, QString& text);
     void updateName();
     void updateStatus();
@@ -115,6 +116,7 @@ private:
     void removeMachine();
 
     QLabel *textLabel;
+    QPushButton *sshButton;
 
     QGroupBox *machineGroupBox;
     QPushButton *updateButton;
