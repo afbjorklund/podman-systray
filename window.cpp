@@ -196,7 +196,7 @@ void Window::createMachineGroupBox()
     statusLabel = new QLabel("Unknown");
 
 #ifdef QT_NO_TERMWIDGET
-    sshButton->setEnabled(false);
+    sshButton->hide());
 #endif
 
     startButton = new QPushButton(tr("Start"));
@@ -306,12 +306,14 @@ void Window::updateStatus()
         if (text == QString("Currently running\n")) {
             updateVersion();
             updateConnections();
+            sshButton->setEnabled(true);
             statusLabel->setText(tr("Running"));
             startButton->setEnabled(false);
             stopButton->setEnabled(true);
             initButton->setEnabled(false);
             removeButton->setEnabled(false);
         } else if (!text->isEmpty()){
+            sshButton->setEnabled(false);
             statusLabel->setText(tr("Not Running"));
             startButton->setEnabled(true);
             stopButton->setEnabled(false);
@@ -320,6 +322,7 @@ void Window::updateStatus()
         } else {
             clearVersion();
             clearConnections();
+            sshButton->setEnabled(false);
             statusLabel->setText(tr("Not Initialized"));
             startButton->setEnabled(false);
             stopButton->setEnabled(false);
