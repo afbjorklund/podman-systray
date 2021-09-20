@@ -31,6 +31,10 @@ $ ./systray
 
 ![podman-systray screenshot](screenshot3.png)
 
+### SSH console
+
+![podman-systray screenshot](screenshot4.png)
+
 ----
 
 Added the podman logo to the [systray](https://doc.qt.io/qt-5/qtwidgets-desktop-systray-example.html) example, as a proof-of-concept.
