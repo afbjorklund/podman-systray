@@ -205,7 +205,9 @@ void Window::createMachineGroupBox()
     removeButton = new QPushButton(tr("Remove"));
 
     versionLabel = new QLabel();
-    osReleaseLabel = new QLabel();
+    osReleaseIcon = new QLabel();
+    osReleaseIcon->setFixedWidth(32);
+    osReleaseName = new QLabel();
 
     QGridLayout *machineLayout = new QGridLayout;
     machineLayout->addWidget(nameLabel, 0, 0, 1, 3);
@@ -217,7 +219,8 @@ void Window::createMachineGroupBox()
     machineLayout->addWidget(versionLabel, 2, 0, 2, 2);
     machineLayout->addWidget(initButton, 3, 2);
     machineLayout->addWidget(removeButton, 3, 3);
-    machineLayout->addWidget(osReleaseLabel, 4, 0, 1, 4);
+    machineLayout->addWidget(osReleaseIcon, 4, 0);
+    machineLayout->addWidget(osReleaseName, 4, 1, 1, 3);
     machineGroupBox->setLayout(machineLayout);
 }
 
@@ -338,13 +341,24 @@ void Window::updateStatus()
     delete text;
 }
 
-QString Window::prettyName(QString release)
+QString Window::releaseInfo(QString release, QString field)
 {
-    QRegExp re("PRETTY_NAME=\"([^\"]*)\"");
+    QRegExp re(field + "=\"?([^\"\n]*)\"?");
     if (release.contains(re)) {
         return re.cap(1);
     }
     return "";
+}
+
+QString Window::prettyName(QString release)
+{
+    return releaseInfo(release, "PRETTY_NAME");
+}
+
+QPixmap Window::logoPixmap(QString release)
+{
+    QString logo = releaseInfo(release, "LOGO");
+    return QPixmap();
 }
 
 void Window::updateVersion()
@@ -367,14 +381,17 @@ void Window::updateVersion()
     QString release;
     success = getProcessOutput(arguments, release);
     if (success) {
-        osReleaseLabel->setText(prettyName(release));
+        osReleaseIcon->setPixmap(logoPixmap(release).scaled(32, 32,
+                                 Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        osReleaseName->setText(prettyName(release));
     }
 }
 
 void Window::clearVersion()
 {
     versionLabel->setText("");
-    osReleaseLabel->setText("");
+    osReleaseIcon->clear();
+    osReleaseName->setText("");
 }
 
 void Window::updateConnections()

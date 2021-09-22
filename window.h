@@ -67,6 +67,7 @@ class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QMenu;
+class QPixmap;
 class QPushButton;
 class QSpinBox;
 class QString;
@@ -101,7 +102,9 @@ private:
     bool getProcessOutput(QStringList arguments, QString& text);
     void updateName();
     void updateStatus();
+    QString releaseInfo(QString release, QString field);
     QString prettyName(QString release);
+    QPixmap logoPixmap(QString release);
     void updateVersion();
     void clearVersion();
     void updateConnections();
@@ -127,7 +130,8 @@ private:
     QPushButton *initButton;
     QPushButton *removeButton;
     QLabel *versionLabel;
-    QLabel *osReleaseLabel;
+    QLabel *osReleaseIcon;
+    QLabel *osReleaseName;
 
     QGroupBox *connectionGroupBox;
     QComboBox *connectionComboBox;
