@@ -3,5 +3,6 @@
    <file>images/podman.png</file>
    <file>images/text.png</file>
    <file>images/view-refresh.png</file>
+   <file>images/fedora-logo-icon.png</file>
 </qresource>
 </RCC>

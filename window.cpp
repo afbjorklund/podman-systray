@@ -358,6 +358,9 @@ QString Window::prettyName(QString release)
 QPixmap Window::logoPixmap(QString release)
 {
     QString logo = releaseInfo(release, "LOGO");
+    if (logo == "fedora-logo-icon") {
+        return QPixmap(":/images/fedora-logo-icon.png");
+    }
     return QPixmap();
 }
 
