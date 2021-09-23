@@ -14,7 +14,7 @@ Or on the command line:
 $ qmake
 $ make
 ...
-$ ./systray
+$ ./podman-systray
 ```
 
 ## Screenshots

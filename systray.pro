@@ -6,8 +6,16 @@ RESOURCES     = systray.qrc
 QT += widgets
 requires(qtConfig(combobox))
 
+TARGET        = podman-systray
+unix {
+  isEmpty(PREFIX) {
+    PREFIX = /usr/local
+  }
+}
+BINDIR        = $$PREFIX/bin
+
 # install
-target.path = $$[QT_INSTALL_EXAMPLES]/widgets/desktop/systray
+target.path =$$BINDIR
 INSTALLS += target
 
 DISTFILES += \

@@ -2,6 +2,8 @@ build-systray-Desktop-Debug/
 build-systray-Desktop-Release/
 build-systray-Desktop-Profile/
 systray
+podman-systray
+podman-systray.exe
 systray.pro.user
 # qmake
 .qmake.stash
