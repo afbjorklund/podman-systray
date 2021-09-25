@@ -56,7 +56,10 @@
 
 #include <QAction>
 #include <QCheckBox>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QComboBox>
+#include <QFormLayout>
 #include <QCoreApplication>
 #include <QCloseEvent>
 #include <QGroupBox>
@@ -491,9 +494,57 @@ void Window::stopMachine()
     updateStatus();
 }
 
+static int cpus = 1;
+static int memory = 2048;
+static int disk_size = 10;
+
+bool Window::askCustom()
+{
+    QDialog dialog;
+    dialog.setWindowTitle(tr("podman machine init"));
+    dialog.setModal(true);
+
+    QFormLayout form(&dialog);
+    QLineEdit cpuField(QString::number(cpus), &dialog);
+    form.addRow(new QLabel(tr("CPUs")), &cpuField);
+    QLineEdit memoryField(QString::number(memory), &dialog);
+    form.addRow(new QLabel(tr("Memory")), &memoryField);
+    QLineEdit diskSizeField(QString::number(disk_size), &dialog);
+    form.addRow(new QLabel(tr("Disk Size")), &diskSizeField);
+
+    QDialogButtonBox buttonBox(Qt::Horizontal, &dialog);
+    buttonBox.addButton(QString(tr("Custom")), QDialogButtonBox::AcceptRole);
+    connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    buttonBox.addButton(QString(tr("Defaults")), QDialogButtonBox::RejectRole);
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    form.addRow(&buttonBox);
+
+    int code = dialog.exec();
+    if (code == QDialog::Accepted) {
+        cpus = cpuField.text().toInt();
+        memory = memoryField.text().toInt();
+        disk_size = diskSizeField.text().toInt();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void Window::initMachine()
 {
-    sendMachineCommand(QString("init"));
+    if (askCustom()) {
+        QStringList args(QString("init"));
+        args << QString("--cpus");
+        args << QString::number(cpus);
+        args << QString("--memory");
+        args << QString::number(memory);
+        args << QString("--disk-size");
+        args << QString::number(disk_size);
+        sendMachineCommand(args);
+    } else {
+        sendMachineCommand(QString("init"));
+    }
+
     updateStatus();
 }
 

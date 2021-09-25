@@ -114,6 +114,7 @@ private:
     void sendMachineCommand(QStringList cmds);
     void startMachine();
     void stopMachine();
+    bool askCustom();
     void initMachine();
     bool askConfirm();
     void removeMachine();
