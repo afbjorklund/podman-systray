@@ -21,19 +21,24 @@ $ ./podman-systray
 
 ### First launch
 
-![podman-systray screenshot](screenshot1.png)
+![podman-systray screenshot](assets/screenshot1.png)
+
+### Init parameters
+
+![podman-systray screenshot](assets/screenshot2.png)
+
 
 ### Not yet running
 
-![podman-systray screenshot](screenshot2.png)
+![podman-systray screenshot](assets/screenshot3.png)
 
 ### Running machine
 
-![podman-systray screenshot](screenshot3.png)
+![podman-systray screenshot](assets/screenshot4.png)
 
 ### SSH console
 
-![podman-systray screenshot](screenshot4.png)
+![podman-systray screenshot](assets/screenshot5.png)
 
 ----
 
