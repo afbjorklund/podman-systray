@@ -22,6 +22,7 @@ DISTFILES += \
     LICENSE
 
 win32: DEFINES += QT_NO_TERMWIDGET
+macx: DEFINES += QT_NO_TERMWIDGET
 
-unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += qtermwidget5
+unix:!macx: CONFIG += link_pkgconfig
+unix:!macx: PKGCONFIG += qtermwidget5
