@@ -1,3 +1,13 @@
+# DEPRECATED
+
+Red Hat is working on a native Podman System Monitor menu bar app:
+
+<https://www.redhat.com/sysadmin/podman-mac-machine-architecture>
+
+This will be a native Mac application, instead of this Qt application.
+
+Details: [https://podman.io/community/meeting/notes/2021-10-21/](https://podman.io/community/meeting/notes/2021-10-21/#podman-system-monitor-for-mac--130-in-video)
+
 # Podman System Tray Icon
 
 ## Running
